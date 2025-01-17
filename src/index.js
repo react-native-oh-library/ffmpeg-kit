@@ -1,6 +1,5 @@
 import {NativeEventEmitter, NativeModules} from 'react-native';
-
-const {FFmpegKitReactNativeModule} = NativeModules;
+import FFmpegKitReactNativeModule from './NativeFFmpegKitModule';
 
 const ffmpegSessionCompleteCallbackMap = new Map()
 const ffprobeSessionCompleteCallbackMap = new Map()

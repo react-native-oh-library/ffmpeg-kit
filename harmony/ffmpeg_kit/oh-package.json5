@@ -1,0 +1,13 @@
+{
+  license: '',
+  devDependencies: {},
+  author: '',
+  name: '@react-native-oh-tpl/react-native-ffmpeg-kit',
+  "main": 'index.ets',
+  description: '',
+  type: 'module',
+  version: '6.0.2-0.0.1',
+  dependencies: {
+    "@rnoh/react-native-openharmony": "file:../react_native_openharmony-5.0.0.710.har"
+  },
+}
