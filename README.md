@@ -1,246 +1,414 @@
-# FFmpegKit ![GitHub release](https://img.shields.io/badge/release-v6.0-blue.svg) ![Maven Central](https://img.shields.io/maven-central/v/com.arthenica/ffmpeg-kit-min) ![CocoaPods](https://img.shields.io/cocoapods/v/ffmpeg-kit-ios-min) ![pub](https://img.shields.io/pub/v/ffmpeg_kit_flutter.svg) ![npm](https://img.shields.io/npm/v/ffmpeg-kit-react-native.svg)
-
-## Notice
-FFmpegKit has been officially retired. There will be no further `ffmpeg-kit` releases. 
-
-All previously released `ffmpeg-kit` binaries will be removed according to the following schedule.
-
-| FFmpegKit Version |  Available Until   |
-|:-----------------:|:------------------:|
-|   Less than 6.0   | February 1st, 2025 |
-|        6.0        |  April 1st, 2025   |
-
-Thank you for your support and interest in this project.
-
-<img src="https://github.com/arthenica/ffmpeg-kit/blob/main/docs/assets/ffmpeg-kit-icon-v9.png" width="240">
-
-`FFmpegKit` is a collection of tools to use `FFmpeg`<sup>1</sup> in `Android`, `iOS`, `Linux`, `macOS`, `tvOS`, `Flutter` and `React Native` applications.
-
-It includes scripts to build `FFmpeg` native libraries, a wrapper library to run `FFmpeg`/`FFprobe` commands in
- applications and 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases),
- [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com).
+# FFmpegKit for React Native
 
 ### 1. Features
-- Scripts to build FFmpeg native libraries
-- `FFmpegKit` wrapper library to run `FFmpeg`/`FFprobe` commands in applications
-- Supports native platforms: Android, iOS, Linux, macOS and tvOS
-- Supports hybrid platforms: Flutter, React Native
-- Based on FFmpeg `v4.5-dev` or later with optional system and external libraries
-- 8 prebuilt binary packages available at [Github](https://github.com/arthenica/ffmpeg-kit/releases), [Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and [npm](https://www.npmjs.com)
-- Licensed under `LGPL 3.0` by default, `GPL v3.0` if GPL licensed libraries are enabled
+- Includes both `FFmpeg` and `FFprobe`
+- Supports
+  - Both `Android` and `iOS`
+  - FFmpeg `v6.0`
+  - `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures on Android
+  - `Android API Level 24` or later
+    - `API Level 16` on LTS releases
+  - `armv7`, `armv7s`, `arm64`, `arm64-simulator`, `i386`, `x86_64`, `x86_64-mac-catalyst` and `arm64-mac-catalyst` architectures on iOS
+  - `iOS SDK 12.1` or later
+    - `iOS SDK 10` on LTS releases
+  - Can process Storage Access Framework (SAF) Uris on Android
+  - 25 external libraries
 
-### 2. Android
+    `dav1d`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `twolame`, `vo-amrwbenc`, `zimg`
 
-See [Android](android) to learn more about `FFmpegKit` for `Android`.
+  - 4 external libraries with GPL license
 
-### 3. iOS, macOS, tvOS
+    `vid.stab`, `x264`, `x265`, `xvidcore`
 
-See [Apple](apple) to use `FFmpegKit` on `Apple` platforms (`iOS`, `macOS`, `tvOS`).
+  - `zlib` and `MediaCodec` Android system libraries
+  - `bzip2`, `iconv`, `libuuid`, `zlib` system libraries and `AudioToolbox`, `VideoToolbox`, `AVFoundation` system frameworks on iOS
 
-### 4. Flutter
+- Includes Typescript definitions
+- Licensed under `LGPL 3.0` by default, some packages licensed by `GPL v3.0` effectively
 
-See [Flutter](flutter/flutter) to learn more about `FFmpegKit` for `Flutter`.
+### 2. Installation
 
-### 5. Linux
+```sh
+yarn add ffmpeg-kit-react-native
+```
 
-See [Linux](linux) to learn more about `FFmpegKit` for `Linux`.
+#### 2.1 Packages
 
-### 6. React Native
+`FFmpeg` includes built-in encoders for some popular formats. However, there are certain external libraries that needs
+to be enabled in order to encode specific formats/codecs. For example, to encode an `mp3` file you need `lame` or
+`shine` library enabled. You have to install a `ffmpeg-kit-react-native` package that has at least one of them inside.
+To encode an `h264` video, you need to install a package with `x264` inside. To encode `vp8` or `vp9` videos, you need
+a `ffmpeg-kit-react-native` package with `libvpx` inside.
 
-See [React Native](react-native) to learn more about `FFmpegKit` for `React Native`.
+`ffmpeg-kit` provides eight packages that include different sets of external libraries. These packages are named
+according to the external libraries included. Refer to the
+[Packages](https://github.com/arthenica/ffmpeg-kit/wiki/Packages) wiki page to see the names of those
+packages and external libraries included in each one of them.
 
-### 7. Build Scripts
+##### 2.1.1 Package Names
 
-Use `android.sh`, `ios.sh`, `linux.sh`, `macos.sh` and `tvos.sh` to build `FFmpegKit` for each native platform.
-
-All scripts support additional options to enable optional libraries and disable platform architectures. See
-[Building](https://github.com/arthenica/ffmpeg-kit/wiki/Building) wiki page for the details.
-
-### 8. FFmpegKit Library
-
-`FFmpegKit` is a wrapper library that allows you to easily run `FFmpeg`/`FFprobe` commands in applications. It 
-provides additional features on top of `FFmpeg` to enable platform specific resources, control how commands are 
-executed and how the results are handled.
-
-`Android` library of `FFmpegKit` has a `Java` API, `Apple` libraries (`iOS`, `macOS`, `tvOS`) have an `Objective-C`
- API, `Flutter` library comes with a `Dart` API, `Linux` library has a `C++` API and `React Native` library provides
-a `JavaScript` API with `Typescript` definitions, which are identical in terms of features and capabilities.
-
-### 9. Packages
-
-There are eight different `ffmpeg-kit` packages distributed on 
-[Github](https://github.com/arthenica/ffmpeg-kit/releases), 
-[Maven Central](https://search.maven.org), [CocoaPods](https://cocoapods.org), [pub](https://pub.dev) and
- [npm](https://www.npmjs.com).
-Below you can see which system libraries and external libraries are enabled in each one of them.
-
-Please remember that some parts of `FFmpeg` are licensed under the `GPL` and only `GPL` licensed `ffmpeg-kit` packages 
-include them.
+The following table shows all package names and their respective API levels, iOS deployment targets defined in
+`ffmpeg-kit-react-native`.
 
 <table>
 <thead>
 <tr>
+<th align="center">Package</th>
+<th align="center" colspan="3">Main Release</th>
+<th align="center" colspan="3">LTS Release</th>
+</tr>
+<tr>
 <th align="center"></th>
-<th align="center"><sup>min</sup></th>
-<th align="center"><sup>min-gpl</sup></th>
-<th align="center"><sup>https</sup></th>
-<th align="center"><sup>https-gpl</sup></th>
-<th align="center"><sup>audio</sup></th>
-<th align="center"><sup>video</sup></th>
-<th align="center"><sup>full</sup></th>
-<th align="center"><sup>full-gpl</sup></th>
+<th align="center">Name</th>
+<th align="center">Android<br>API Level</th>
+<th align="center">iOS Minimum<br>Deployment Target</th>
+<th align="center">Name</th>
+<th align="center">Android<br>API Level</th>
+<th align="center">iOS Minimum<br>Deployment Target</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center"><sup>external libraries</sup></td>
-<td align="center">-</td>
-<td align="center"><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
-<td align="center"><sup>gmp</sup><br><sup>gnutls</sup></td>
-<td align="center"><sup>gmp</sup><br><sup>gnutls</sup><br><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
-<td align="center"><sup>lame</sup><br><sup>libilbc</sup><br><sup>libvorbis</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup></td>
-<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>kvazaar</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libtheora</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>snappy</sup><br><sup>zimg</sup></td>
-<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vo-amrwbenc</sup><br><sup>zimg</sup></td>
-<td align="center"><sup>dav1d</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>vo-amrwbenc</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup><br><sup>zimg</sup></td>
+<td align="center">min</td>
+<td align="center">min</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">min-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
 </tr>
 <tr>
-<td align="center"><sup>android system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>MediaCodec</sup></td>
+<td align="center">min-gpl</td>
+<td align="center">min-gpl</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">min-gpl-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
 </tr>
 <tr>
-<td align="center"><sup>ios system libraries</sup></td>
-<td align="center" colspan=8><sup>bzip2</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>iconv</sup><br><sup>VideoToolbox</sup><br><sup>zlib</sup></td>
+<td align="center">https</td>
+<td align="center">(*) https</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">https-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
 </tr>
 <tr>
-<tr>
-<td align="center"><sup>macos system libraries</sup></td>
-<td align="center" colspan=8><sup>bzip2</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>Core Image</sup><br><sup>iconv</sup><br><sup>OpenCL</sup><br><sup>OpenGL</sup><br><sup>VideoToolbox</sup><br><sup>zlib</sup></td>
+<td align="center">https-gpl</td>
+<td align="center">https-gpl</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">https-gpl-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
 </tr>
 <tr>
-<td align="center"><sup>tvos system libraries</sup></td>
-<td align="center" colspan=8><sup>bzip2</sup><br><sup>AudioToolbox</sup><br><sup>iconv</sup><br><sup>VideoToolbox</sup><br><sup>zlib</sup></td>
+<td align="center">audio</td>
+<td align="center">audio</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">audio-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
+</tr>
+<tr>
+<td align="center">video</td>
+<td align="center">video</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">video-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
+</tr>
+<tr>
+<td align="center">full</td>
+<td align="center">full</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">full-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
+</tr>
+<tr>
+<td align="center">full-gpl</td>
+<td align="center">full-gpl</td>
+<td align="center">24</td>
+<td align="center">12.1</td>
+<td align="center">full-gpl-lts</td>
+<td align="center">16</td>
+<td align="center">10</td>
 </tr>
 </tbody>
 </table>
 
- - `AVFoundation` is not available on `tvOS`
- - `VideoToolbox` is not available on LTS releases of `iOS` and `tvOS`
- - `zimg` is supported since `v4.5.1`
+(*) - Main `https` package is the default package
 
-### 10. Versions
+#### 2.2 Enabling Packages
 
-`FFmpegKit` binaries generated use the same major and minor version numbers as the upstream `FFmpeg` project. The
-third and last number in the version string, if exists, is specific to `FFmpegKit`. It shows different releases from
-the same `FFmpeg` release branch. 
+Installing `ffmpeg-kit-react-native` enables the `https` package by default. It is possible to enable other
+packages using the instructions below.
 
-`dev` part in the version string indicates that `FFmpeg` source code is cloned from the `FFmpeg` `master` branch and
-the exact version number of `FFmpeg` is obtained using the `git describe --tags` command.
+##### 2.2.1 Enabling a Package on Android
 
-|    Platforms     |                                 FFmpegKit Version                                 | FFmpeg Version | Release Date |
-|:----------------:|:---------------------------------------------------------------------------------:|:--------------:|:------------:|
-|     Flutter      |   [6.0.3](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v6.0.3)    |      6.0       | Sep 19, 2023 |
-|   React Native   | [6.0.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v6.0.2) |      6.0       | Sep 19, 2023 |
-|     Flutter      |   [6.0.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v6.0.2)    |      6.0       | Sep 03, 2023 |
-|   React Native   | [6.0.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v6.0.1) |      6.0       | Sep 03, 2023 |
-|     Flutter      |   [6.0.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v6.0.1)    |      6.0       | Sep 03, 2023 |
-|   React Native   | [6.0.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v6.0.0) |      6.0       | Aug 27, 2023 |
-|     Flutter      |   [6.0.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v6.0.0)    |      6.0       | Aug 27, 2023 |
-|      Android<br>Apple       |         [6.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/v6.0)          |      6.0       | Aug 21, 2023 |
-|   React Native   | [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v5.1.0) |     5.1.2      | Oct 02, 2022 |
-|     Flutter      |   [5.1.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v5.1.0)    |     5.1.2      | Oct 02, 2022 |
-|     Android<br>Apple      |         [5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v5.1)          |     5.1.2      | Sep 29, 2022 |
-|   React Native   | [4.5.2](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.2) |  4.5-dev-3393  | May 25, 2022 |
-|     Flutter      |   [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.1)    |  4.5-dev-3393  | Jan 02, 2022 |
-|   React Native   | [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.1) |  4.5-dev-3393  | Jan 02, 2022 |
-|     Android      |       [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)        |  4.5-dev-3393  | Jan 01, 2022 |
-|      Apple       |       [4.5.1](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5.1)        |  4.5-dev-3393  | Dec 30, 2021 |
-|     Flutter      |   [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/flutter.v4.5.0)    |  4.5-dev-2008  | Oct 05, 2021 |
-|   React Native   | [4.5.0](https://github.com/arthenica/ffmpeg-kit/releases/tag/react.native.v4.5.0) |  4.5-dev-2008  | Oct 01, 2021 |
-| Android<br>Apple |         [4.5](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.5)          |  4.5-dev-2008  | Sep 18, 2021 |
-| Android<br>Apple |         [4.4](https://github.com/arthenica/ffmpeg-kit/releases/tag/v4.4)          |  4.4-dev-3015  | Mar 03, 2021 |
+- Edit `android/build.gradle` file and add the package name in `ext.ffmpegKitPackage` variable.
 
-### 11. LTS Releases
+    ```gradle
+    ext {
+        ffmpegKitPackage = "<package name>"
+    }
 
-`FFmpegKit` binaries are published in two release variants: `Main Release` and `LTS Release`. 
+    ```
 
-- Main releases include complete functionality of the library and support the latest SDK/API features.
+##### 2.2.2 Enabling a Package on iOS
 
-- LTS releases are customized to support a wider range of devices. They are built using older API/SDK versions, so some features are not available on them.
+- Edit `ios/Podfile` file and add the package name as `subspec`. After that run `pod install` again.
 
-This table shows the differences between two variants.
+    ```ruby
+    pod 'ffmpeg-kit-react-native', :subspecs => ['<package name>'], :podspec => '../node_modules/ffmpeg-kit-react-native/ffmpeg-kit-react-native.podspec'
+    ```
 
-|        | Main Release |                        LTS Release                        |
-| :----: | :----: |:---------------------------------------------------------:|
-| Android API Level | 24 |                            16                             | 
-| Android Camera Access | Yes |                             -                             |
-| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
-| iOS Min SDK | 12.1 |                            10                             |
-| iOS VideoToolbox | Yes |                             -                             |
-| iOS AVFoundation | Yes |                             -                             |
-| iOS Architectures | arm64<br/>arm64-simulator<br/>arm64-mac-catalyst<br/>x86-64<br/>x86-64-mac-catalyst |            armv7<br/>arm64<br/>i386<br/>x86-64            |
-| iOS Bundle Format | XCFrameworks |                        Frameworks                         |
-| Mac Catalyst Min Version | 14.0 |                             -                             |
-| macOS Min SDK | 10.15 |                           10.12                           |
-| macOS AVFoundation | Yes |                             -                             |
-| macOS Architectures | arm64<br/>x86-64 |                          x86-64                           |
-| macOS Bundle Format | XCFrameworks |                        Frameworks                         |
-| tvOS Min SDK | 11.0 |                           10.0                            |
-| tvOS VideoToolbox | Yes |                             -                             |
-| tvOS Architectures | arm64<br/>x86-64<br/>arm64-simulator |                     arm64<br/>x86-64                      |
-| tvOS Bundle Format | XCFrameworks |                        Frameworks                         |
+- Note that if you have `use_native_modules!` in your `Podfile`, specifying a `subspec` may cause the following error.
+  You can fix it by defining `ffmpeg-kit-react-native` dependency before `use_native_modules!` in your `Podfile`.
 
-### 12. Documentation
+  ```
+  [!] There are multiple dependencies with different sources for `ffmpeg-kit-react-native` in `Podfile`:
 
-A more detailed documentation is available under [Wiki](https://github.com/arthenica/ffmpeg-kit/wiki).
+  - ffmpeg-kit-react-native (from `../node_modules/ffmpeg-kit-react-native`)
+  - ffmpeg-kit-react-native/video (from `../node_modules/ffmpeg-kit-react-native/ffmpeg-kit-react-native.podspec`)
+  ```
 
-### 13. Test Applications
+#### 2.3 Enabling LTS Releases
 
-You can see how `FFmpegKit` is used inside an application by running test applications created under 
-[FFmpegKit Test](https://github.com/arthenica/ffmpeg-kit-test) project.
+In order to install the `LTS` variant, install the `https-lts` package using instructions in `2.2` or append `-lts` to
+the package name you are using.
 
-All applications are identical and supports command execution, video encoding, accessing https urls, encoding audio,
-burning subtitles, video stabilisation, pipe operations and concurrent command execution.
+#### 2.4 LTS Releases
 
-### 14. License
+`ffmpeg-kit-react-native` is published in two variants: `Main Release` and `LTS Release`. Both releases share the
+same source code but is built with different settings (Architectures, API Level, iOS Min SDK, etc.). Refer to the
+[LTS Releases](https://github.com/arthenica/ffmpeg-kit/wiki/LTS-Releases) wiki page to see how they differ from each
+other.
 
-`FFmpegKit` library alone is licensed under the `LGPL v3.0`.
+### 3. Using
 
-`FFmpegKit` bundles (`.aar` archives, `frameworks`, `xcframeworks`), which include both  `FFmpegKit` and `FFmpeg`
-libraries, are also licensed under the `LGPL v3.0`. However, if the source code is built using the optional
-`--enable-gpl` flag or prebuilt binaries with `-gpl` postfix are used, then `FFmpegKit` bundles become subject to the
-`GPL v3.0`. Because, `FFmpeg` is licensed under the `GPL v3.0` in those bundles. And that makes the whole bundle
-effectively subject to the `GPL v3.0`.
+1. Execute FFmpeg commands.
 
-`FFmpegKit` build scripts always configure `FFmpeg` with `--enable-version3` option. And never enable non-free
-libraries. Thus, `FFmpeg` libraries created by `FFmpegKit` are licensed under the `LGPL v3.0` by default. Only when
-`--enable-gpl` is provided they become subject to `GPL v3.0`. That is how prebuilt binaries with `-gpl` postfix are
-compiled.
+    ```js
+    import { FFmpegKit } from 'ffmpeg-kit-react-native';
 
-Refer to [Licenses](https://github.com/arthenica/ffmpeg-kit/wiki/Licenses) to see the licenses of all libraries.
-[Trademark](https://github.com/arthenica/ffmpeg-kit/wiki/Trademark) lists the trademarks used in the `FFmpegKit`
-documentation.
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
+      const returnCode = await session.getReturnCode();
 
-### 15. Patents
+      if (ReturnCode.isSuccess(returnCode)) {
 
-It is not clearly explained in their documentation, but it is believed that `FFmpeg`, `kvazaar`, `x264` and `x265`
-include algorithms which are subject to software patents. If you live in a country where software algorithms are
-patentable then you'll probably need to pay royalty fees to patent holders. We are not lawyers though, so we recommend
-that you seek legal advice first. See [FFmpeg Patent Mini-FAQ](https://ffmpeg.org/legal.html).
+        // SUCCESS
 
-`openh264` clearly states that it uses patented algorithms. Therefore, if you build `ffmpeg-kit` with `openh264` and
-distribute that library, then you are subject to pay MPEG LA licensing fees. Refer to
-[OpenH264 FAQ](https://www.openh264.org/faq.html) page for the details.
+      } else if (ReturnCode.isCancel(returnCode)) {
 
-### 16. Trademarks
+        // CANCEL
 
-<sup>1</sup> `FFmpeg` is a trademark of [Fabrice Bellard](http://www.bellard.org/). `FFmpegKit` is an independent project and not affiliated with the `FFmpeg` trademark holder.
+      } else {
 
-### 17. Contributing
+        // ERROR
 
-See our [CONTRIBUTING](CONTRIBUTING.md) guide.
+      }
+    });
+    ```
 
-### 18. See Also
+2. Each `execute` call creates a new session. Access every detail about your execution from the
+   session created.
 
-- [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
-- [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)
-- [FFmpeg External Library Licenses](https://www.ffmpeg.org/doxygen/4.0/md_LICENSE.html)
+    ```js
+    FFmpegKit.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then(async (session) => {
+
+      // Unique session id created for this execution
+      const sessionId = session.getSessionId();
+
+      // Command arguments as a single string
+      const command = session.getCommand();
+
+      // Command arguments
+      const commandArguments = session.getArguments();
+
+      // State of the execution. Shows whether it is still running or completed
+      const state = await session.getState();
+
+      // Return code for completed sessions. Will be undefined if session is still running or FFmpegKit fails to run it
+      const returnCode = await session.getReturnCode()
+
+      const startTime = session.getStartTime();
+      const endTime = await session.getEndTime();
+      const duration = await session.getDuration();
+
+      // Console output generated for this execution
+      const output = await session.getOutput();
+
+      // The stack trace if FFmpegKit fails to run a command
+      const failStackTrace = await session.getFailStackTrace()
+
+      // The list of logs generated for this execution
+      const logs = await session.getLogs();
+
+      // The list of statistics generated for this execution (only available on FFmpegSession)
+      const statistics = await session.getStatistics();
+
+    });
+    ```
+
+3. Execute `FFmpeg` commands by providing session specific `execute`/`log`/`session` callbacks.
+
+    ```js
+    FFmpegKit.executeAsync('-i file1.mp4 -c:v mpeg4 file2.mp4', session => {
+
+      // CALLED WHEN SESSION IS EXECUTED
+
+    }, log => {
+
+      // CALLED WHEN SESSION PRINTS LOGS
+
+    }, statistics => {
+
+      // CALLED WHEN SESSION GENERATES STATISTICS
+
+    });
+    ```
+
+4. Execute `FFprobe` commands.
+
+    ```js
+    FFprobeKit.execute(ffprobeCommand).then(async (session) => {
+
+      // CALLED WHEN SESSION IS EXECUTED
+
+    });
+    ```
+
+5. Get media information for a file/url.
+
+    ```js
+    FFprobeKit.getMediaInformation(testUrl).then(async (session) => {
+      const information = await session.getMediaInformation();
+
+      if (information === undefined) {
+
+        // CHECK THE FOLLOWING ATTRIBUTES ON ERROR
+        const state = FFmpegKitConfig.sessionStateToString(await session.getState());
+        const returnCode = await session.getReturnCode();
+        const failStackTrace = await session.getFailStackTrace();
+        const duration = await session.getDuration();
+        const output = await session.getOutput();
+      }
+    });
+    ```
+
+6. Stop ongoing FFmpeg operations.
+
+  - Stop all sessions
+    ```js
+    FFmpegKit.cancel();
+    ```
+  - Stop a specific session
+    ```js
+    FFmpegKit.cancel(sessionId);
+    ```
+
+7. (Android) Convert Storage Access Framework (SAF) Uris into paths that can be read or written by
+`FFmpegKit` and `FFprobeKit`.
+
+  - Reading a file:
+    ```js
+    FFmpegKitConfig.selectDocumentForRead('*/*').then(uri => {
+        FFmpegKitConfig.getSafParameterForRead(uri).then(safUrl => {
+            FFmpegKit.executeAsync(`-i ${safUrl} -c:v mpeg4 file2.mp4`);
+        });
+    });
+    ```
+
+  - Writing to a file:
+    ```js
+    FFmpegKitConfig.selectDocumentForWrite('video.mp4', 'video/*').then(uri => {
+        FFmpegKitConfig.getSafParameterForWrite(uri).then(safUrl => {
+            FFmpegKit.executeAsync(`-i file1.mp4 -c:v mpeg4 ${safUrl}`);
+        });
+    });
+    ```
+
+8. Get previous `FFmpeg`, `FFprobe` and `MediaInformation` sessions from the session history.
+
+    ```js
+    FFmpegKit.listSessions().then(sessionList => {
+      sessionList.forEach(async session => {
+        const sessionId = session.getSessionId();
+      });
+    });
+
+    FFprobeKit.listFFprobeSessions().then(sessionList => {
+      sessionList.forEach(async session => {
+        const sessionId = session.getSessionId();
+      });
+    });
+
+    FFprobeKit.listMediaInformationSessions().then(sessionList => {
+      sessionList.forEach(async session => {
+        const sessionId = session.getSessionId();
+      });
+    });
+    ```
+
+9. Enable global callbacks.
+  - Session type specific Complete Callbacks, called when an async session has been completed
+
+    ```js
+    FFmpegKitConfig.enableFFmpegSessionCompleteCallback(session => {
+      const sessionId = session.getSessionId();
+    });
+
+    FFmpegKitConfig.enableFFprobeSessionCompleteCallback(session => {
+      const sessionId = session.getSessionId();
+    });
+
+    FFmpegKitConfig.enableMediaInformationSessionCompleteCallback(session => {
+      const sessionId = session.getSessionId();
+    });
+    ```
+
+  - Log Callback, called when a session generates logs
+
+    ```js
+    FFmpegKitConfig.enableLogCallback(log => {
+      const message = log.getMessage();
+    });
+    ```
+
+  - Statistics Callback, called when a session generates statistics
+
+    ```js
+    FFmpegKitConfig.enableStatisticsCallback(statistics => {
+      const size = statistics.getSize();
+    });
+    ```
+
+10. Register system fonts and custom font directories.
+
+    ```js
+    FFmpegKitConfig.setFontDirectoryList(["/system/fonts", "/System/Library/Fonts", "<folder with fonts>"]);
+    ```
+
+### 4. Test Application
+
+You can see how `FFmpegKit` is used inside an application by running `react-native` test applications developed under
+the [FFmpegKit Test](https://github.com/arthenica/ffmpeg-kit-test) project.
+
+### 5. Tips
+
+See [Tips](https://github.com/arthenica/ffmpeg-kit/wiki/Tips) wiki page.
+
+### 6. License
+
+See [License](https://github.com/arthenica/ffmpeg-kit/wiki/License) wiki page.
+
+### 7. Patents
+
+See [Patents](https://github.com/arthenica/ffmpeg-kit/wiki/Patents) wiki page.
