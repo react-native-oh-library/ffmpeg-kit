@@ -1,0 +1,1 @@
+export * as TM from "./RNFFmpegKitModule"

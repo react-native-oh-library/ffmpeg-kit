@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "ffmpeg_kit",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ],
+  }
+}
