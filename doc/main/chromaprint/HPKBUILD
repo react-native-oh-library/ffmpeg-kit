@@ -1,0 +1,64 @@
+# Contributor: xuzhao <xuzhaor@isoftstone.com>, Jeff Han <hanjinfei@foxmail.com>
+# Maintainer: xuzhao <xuzhaor@isoftstone.com>
+pkgname=chromaprint
+pkgver=1.5.1
+pkgrel=0
+pkgdesc="C library for generating audio fingerprints used by AcoustID"
+url="https://github.com/acoustid/chromaprint"
+archs=("armeabi-v7a" "arm64-v8a")
+license="LGPLv2.1"
+depends=("FFmpeg" "googletest")
+makedepends=()
+# source="https://github.com/acoustid/chromaprint/archive/refs/tags/v1.5.1.tar.gz"
+source="https://ghproxy.net/https://github.com/acoustid/chromaprint.git"
+
+autounpack=false
+downloadpackage=false
+buildtools="cmake"
+
+builddir=$pkgname-${pkgver}
+packagename=$builddir.tar.gz
+cloneFlag=true
+
+prepare() {
+    if $cloneFlag
+    then
+        git clone $source $builddir > $publicbuildlog 2>&1
+        # TODO 退出码校验
+        if [ $? -ne 0 ]
+        then
+            echo "$pkgname git clone $source error."
+            return -1
+        fi
+        cloneFlag=false
+    fi
+    mkdir -p $builddir/$ARCH-build
+}
+
+build() {
+    cd $builddir
+    ${OHOS_SDK}/native/build-tools/cmake/bin/cmake "$@" -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF \
+        -B$ARCH-build -S./ > $buildlog 2>&1
+    $MAKE VERBOSE=1 -C $ARCH-build >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd $builddir
+    $MAKE -C $ARCH-build install >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+check() {
+    echo "The test must be on an OpenHarmony device!"
+    # TODO
+}
+
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+    return $ret
+}

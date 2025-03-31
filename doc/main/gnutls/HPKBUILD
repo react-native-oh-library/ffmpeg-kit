@@ -1,0 +1,77 @@
+# Contributor: zhongluping <278527840@qq.com>
+# Maintainer: zhongluping <278527840@qq.com>
+pkgname=gnutls
+pkgver=3.6.4
+pkgrel=0
+pkgdesc="GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them."
+url="https://www.gnupg.org/ftp/gcrypt/gnutls"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("lgpl-2.0")
+depends=("nettle" "gmp" "libidn2" "libtasn1")
+makedepends=()
+
+source="https://www.gnupg.org/ftp/gcrypt/${pkgname}/v3.6/${pkgname}-${pkgver}.tar.xz"
+
+downloadpackage=true
+autounpack=true
+buildtools="configure"
+
+builddir=$pkgname-${pkgver}
+packagename=$builddir.tar.xz
+
+source envset.sh
+host=
+
+prepare() {
+    mkdir -p $builddir/$ARCH-build
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        setarm32ENV
+        host=arm-linux
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        setarm64ENV
+        host=aarch64-linux
+    else
+        return -1
+    fi
+
+    return 0
+}
+
+build() {
+    cd $builddir/$ARCH-build
+    GMP_LIBS="${LYCIUM_ROOT}/usr/gmp/$ARCH/lib" PKG_CONFIG_PATH="${pkgconfigpath}" ../configure "$@" --host=$host --with-included-unistring --disable-hardware-acceleration \
+    --without-p11-kit --disable-nls --disable-guile  --disable-heartbeat --disable-openssl-compatibility --disable-tests --disable-tools > $buildlog 2>&1
+    $MAKE >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd $builddir/$ARCH-build
+    $MAKE install >> $buildlog 2>&1
+    cd $OLDPWD
+    unset host
+}
+
+check() {
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        unsetarm32ENV
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        unsetarm64ENV
+    else
+        return -1
+    fi
+
+    echo "The test must be on an OpenHarmony device!"
+    # real test CMD
+}
+
+# 清理环境
+cleanbuild(){
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}

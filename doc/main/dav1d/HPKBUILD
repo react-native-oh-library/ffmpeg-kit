@@ -1,0 +1,52 @@
+# Contributor: Jeff Han <hanjinfei@foxmail.com>
+# Maintainer: Jeff Han <hanjinfei@foxmail.com>
+pkgname=dav1d
+pkgver=1.4.2
+pkgrel=0
+pkgdesc="dav1d is the fastest AV1 decoder on all platforms :) Targeted to be small, portable and very fast."
+url="https://code.videolan.org/videolan/dav1d"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("BSD 2-Clause Simplified License")
+depends=()
+makedepends=("meson")
+
+source="https://code.videolan.org/videolan/$pkgname/-/archive/$pkgver/$pkgname-$pkgver.zip"
+
+downloadpackage=true
+autounpack=true
+buildtools="meson"
+
+builddir=$pkgname-$pkgver
+packagename=$pkgname-$pkgver.zip
+
+prepare() {
+    cp $ARCH-cross-file.txt $builddir
+    mkdir -p $builddir/$ARCH-build
+}
+
+build() {
+    cd $builddir
+    ohos_sdk_path=${OHOS_SDK//\//\\\/}
+    sed -i 's/ohos_sdk/'"$ohos_sdk_path"'/g' $ARCH-cross-file.txt
+    # meson 过程会下载代码, 可能时间较久, 请保持网络通常
+    meson $ARCH-build --cross-file $ARCH-cross-file.txt --prefix=$LYCIUM_ROOT/usr/$pkgname/$ARCH > $buildlog 2>&1
+    $Ninja -v -C $ARCH-build >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd $builddir
+    $Ninja -v -C $ARCH-build install >> $buildlog 2>&1
+    cd $OLDPWD
+}
+
+check() {
+    echo "The test must be on an OpenHarmony device!"
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir
+}
