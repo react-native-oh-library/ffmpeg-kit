@@ -1,0 +1,91 @@
+# Contributor: 小肉头君 <chenbaodi@huawei.com>
+# Maintainer: 小肉头君 <chenbaodi@huawei.com>
+
+pkgname=libass
+pkgver=0.17.1
+pkgrel=0
+pkgdesc="libass is a portable subtitle renderer for the ASS/SSA (Advanced Substation Alpha/Substation Alpha) subtitle format."
+url="https://github.com/libass/libass"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("ISC License")
+depends=("zlib" "freetype2" "brotli" "fribidi" "harfbuzz" "libpng" "zlib" "fontconfig" "libunibreak") # fontconfig是测试需要的三方库
+makedepends=()
+source="https://github.com/$pkgname/$pkgname/archive/refs/tags/$pkgver.tar.gz"
+
+autounpack=true
+downloadpackage=true
+buildtools="configure"
+
+builddir=$pkgname-$pkgver 
+packagename=$builddir.tar.gz
+
+source envset.sh
+autogenflag=true
+host=
+prepare() {
+    mkdir -p $builddir/$ARCH-build
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        setarm32ENV
+        host=arm-linux
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        setarm64ENV
+        host=aarch64-linux
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+
+    if $autogenflag
+    then
+        cd $builddir
+        ./autogen.sh > $publicbuildlog 2>&1
+        cd $OLDPWD
+        autogenflag=false
+    fi
+}
+
+build() {
+    cd $builddir/$ARCH-build
+    PKG_CONFIG_PATH="${LYCIUM_ROOT}/usr/harfbuzz/$ARCH/lib/pkgconfig:${LYCIUM_ROOT}/usr/glib/$ARCH/lib/pkgconfig:${pkgconfigpath}" \
+    FONTCONFIG_CFLAGS="-I${LYCIUM_ROOT}/usr/fontconfig/$ARCH/include -I${LYCIUM_ROOT}/usr/harfbuzz/$ARCH/include -I${LYCIUM_ROOT}/usr/libxml2/$ARCH/include" \
+    FONTCONFIG_LIBS="${LYCIUM_ROOT}/usr/fontconfig/$ARCH/lib/libfontconfig.so -L${LYCIUM_ROOT}/usr/harfbuzz/$ARCH/lib -lharfbuzz -L${LYCIUM_ROOT}/usr/libxml2/$ARCH/lib -lxml2" \
+    PKG_CONFIG_LIBDIR="${pkgconfigpath}" \
+    ../configure "$@" --enable-test --enable-static --enable-libunibreak --host=$host > $buildlog 2>&1
+
+    # FONTCONFIG_CFLAGS="-I${LYCIUM_ROOT}/usr/fontconfig/$ARCH/include/ ${LYCIUM_ROOT}/usr/libxml2/$ARCH/lib/libxml2.a" FONTCONFIG_LIBS="${LYCIUM_ROOT}/usr/fontconfig/$ARCH/lib/libfontconfig.so" PKG_CONFIG_LIBDIR="${pkgconfigpath}" ../configure "$@" --enable-test --enable-static --host=$host > $buildlog 2>&1
+    $MAKE >> $buildlog 2>&1
+    # 对最关键一步的退出码进行判断
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd $builddir/$ARCH-build
+    $MAKE install >> $buildlog 2>&1
+    cd $OLDPWD
+    unset host
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        unsetarm32ENV
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        unsetarm64ENV
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+}
+
+check() {
+    echo "The test must be on an OpenHarmony device!"
+    # real test
+    # 测试时需要把Unbutu中的usr/share/fonts打包推送到ohos设备中,放在ohos设备同一路径中
+    # ./test/test testass.png  ../compare/test/sub1.ass 0.03
+}
+
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}

@@ -1,0 +1,70 @@
+# Contributor: Jeff Han <hanjinfei@foxmail.com>
+# Maintainer: Jeff Han <hanjinfei@foxmail.com>
+pkgname=bzip2
+pkgver=1.0.8
+pkgrel=0
+pkgdesc="bzip2 is a freely available, patent free (see below), high-quality data compressor. It typically compresses files to within 10% to 15% of the best available techniques (the PPM family of statistical compressors), whilst being around twice as fast at compression and six times faster at decompression."
+url="https://sourceware.org/bzip2/"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("BSD")
+depends=()
+makedepends=()
+
+source="https://sourceware.org/pub/$pkgname/$pkgname-$pkgver.tar.gz"
+
+autounpack=true
+downloadpackage=true
+buildtools="make"
+
+builddir=$pkgname-${pkgver}
+packagename=$builddir.tar.gz
+
+cc=
+ar=
+ranlib=
+# bzip2 采用makefile编译构建，为了保留构建环境(方便测试)。因此同一份源码在解压后分为两份,各自编译互不干扰
+prepare() {
+    cp -rf $builddir $builddir-$ARCH-build
+    cd $builddir-$ARCH-build
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        cc=${OHOS_SDK}/native/llvm/bin/arm-linux-ohos-clang
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        cc=${OHOS_SDK}/native/llvm/bin/aarch64-linux-ohos-clang
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+    ar=${OHOS_SDK}/native/llvm/bin/llvm-ar
+    ranlib=${OHOS_SDK}/native/llvm/bin/llvm-ranlib
+    cd $OLDPWD
+}
+
+build() {
+    cd $builddir-$ARCH-build
+    $MAKE CC=${cc} AR=${ar} RANLIB=${ranlib} libbz2.a bzip2 bzip2recover > $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd $builddir-$ARCH-build
+    $MAKE install PREFIX=$LYCIUM_ROOT/usr/$pkgname/$ARCH >> $buildlog 2>&1
+    cd $OLDPWD
+}
+
+check() {
+    echo "The test must be on an OpenHarmony device!"
+    # make check
+}
+
+recoverpkgbuildenv() {
+    unset cc ar ranlib
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir $builddir-armeabi-v7a-build  $builddir-arm64-v8a-build #${PWD}/$packagename
+}

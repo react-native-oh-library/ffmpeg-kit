@@ -36,7 +36,7 @@ type Log = Readonly<{
 }>;
 
 export interface Spec extends TurboModule {
-	
+  registerGlobalCallbacks():Promise<null>;
   ffmpegSession(argumentsArray:Array<string>):Promise<Session>;
   ffprobeSession(argumentsArray:Array<string>):Promise<Session>;
   mediaInformationSession(argumentsArray:Array<string>):Promise<Session>;
