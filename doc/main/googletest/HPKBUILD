@@ -1,0 +1,53 @@
+# Contributor: 小肉头君 <chenbaodi@huawei.com>, Jeff Han <hanjinfei@foxmail.com>
+# Maintainer: 小肉头君 <chenbaodi@huawei.com>
+
+pkgname=googletest
+pkgver=v1.13.0
+pkgrel=0
+pkgdesc="googletest是由谷歌的测试技术团队开发的测试框架，使用c++实现，具有跨平台等特性。"
+url="https://github.com/google/googletest" #
+archs=("armeabi-v7a" "arm64-v8a")
+license=("BSD-3-Clause license")
+source="https://github.com/google/$pkgname/archive/refs/tags/$pkgver.tar.gz"
+
+patchflag=false
+autounpack=true
+downloadpackage=true
+
+builddir=$pkgname-${pkgver:1}
+packagename=$builddir.tar.gz
+
+prepare() {
+    mkdir -p $builddir/$ARCH-build
+}
+
+build() {
+    cd $builddir
+    ${OHOS_SDK}/native/build-tools/cmake/bin/cmake "$@" -DBUILD_GMOCK=ON -Dgtest_build_tests=ON -Dgmock_build_tests=ON -B$ARCH-build -S./ > $buildlog 2>&1
+    $MAKE -C $ARCH-build >> $buildlog 2>&1
+    # 对最关键一步的退出码进行判断
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+# 安装打包
+package() {
+    cd $builddir
+    $MAKE -C $ARCH-build install >> $buildlog 2>&1
+    cd $OLDPWD
+}
+
+# 测试，需要在 ohos 设备上进行
+check() {
+    echo "The test must be on an OpenHarmony device!"
+    # real test CMD
+    # ctest
+    # 在oh环境中运行当前库的测试套，涉及到python的测试用例无法运行，
+    # 原因是没有python环境，就算有python环境，能够运行，也会因为缺失python依赖的资源导致报错。
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}

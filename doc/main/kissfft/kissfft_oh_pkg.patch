@@ -1,0 +1,35 @@
+diff -Naur kissfft-131.1.0-old/test/CMakeLists.txt kissfft-131.1.0/test/CMakeLists.txt
+--- kissfft-131.1.0-old/test/CMakeLists.txt	2023-06-26 16:54:20.515725662 +0800
++++ kissfft-131.1.0/test/CMakeLists.txt	2023-06-26 19:10:58.779813683 +0800
+@@ -53,11 +53,11 @@
+     endif()
+ endif()
+ 
+-find_package(PythonInterp REQUIRED)
+-add_test(NAME testkiss.py COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/testkiss.py")
+-list(APPEND TESTKISS_PY_ENV "KISSFFT_DATATYPE=${KISSFFT_DATATYPE}")
+-list(APPEND TESTKISS_PY_ENV "KISSFFT_OPENMP=${KISSFFT_OPENMP}")
+-set_tests_properties(testkiss.py PROPERTIES
+-    TIMEOUT 3600
+-    ENVIRONMENT "${TESTKISS_PY_ENV}"
+-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
++#find_package(PythonInterp REQUIRED)
++#add_test(NAME testkiss.py COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/testkiss.py")
++#list(APPEND TESTKISS_PY_ENV "KISSFFT_DATATYPE=${KISSFFT_DATATYPE}")
++#list(APPEND TESTKISS_PY_ENV "KISSFFT_OPENMP=${KISSFFT_OPENMP}")
++#set_tests_properties(testkiss.py PROPERTIES
++    #TIMEOUT 3600
++    #ENVIRONMENT "${TESTKISS_PY_ENV}"
++    #WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+diff -Naur kissfft-131.1.0-old/test/testcpp.cc kissfft-131.1.0/test/testcpp.cc
+--- kissfft-131.1.0-old/test/testcpp.cc	2023-06-26 16:54:20.515725662 +0800
++++ kissfft-131.1.0/test/testcpp.cc	2023-06-26 19:10:36.659881888 +0800
+@@ -43,7 +43,7 @@
+     long double difpower=0;
+     for (int k0=0;k0<nfft;++k0) {
+         complex<long double> acc = 0;
+-        long double phinc = 2*k0* M_PIl / nfft;
++        long double phinc = 2*k0* M_PI / nfft;
+         for (int k1=0;k1<nfft;++k1) {
+             complex<long double> x(inbuf[k1].real(),inbuf[k1].imag()); 
+             acc += x * exp( complex<long double>(0,-k1*phinc) );

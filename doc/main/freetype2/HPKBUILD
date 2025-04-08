@@ -1,0 +1,109 @@
+# Contributor: tyBrave <tianyong13@huawei.com>
+# Maintainer: tyBrave <tianyong13@huawei.com>
+pkgname=freetype2
+pkgver=2.13.1
+pkgrel=0
+pkgdesc=""
+url="https://sourceforge.net/projects/freetype"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("GPL FTL")
+depends=("zlib" "bzip2" "brotli" "libpng") # 循环依赖 "harfbuzz"
+makedepends=()
+source="https://download.savannah.gnu.org/releases/freetype/freetype-$pkgver.tar.xz"
+
+autounpack=true
+downloadpackage=true
+
+builddir=${pkgname:0:8}-${pkgver}
+packagename=$builddir.tar.xz
+
+testdir=
+
+prepare() {
+    testdir=`pwd`/$builddir/$ARCH-build/freetype-cmake-testbuild
+    rm -rf $testdir
+    mkdir -p $testdir
+}
+
+build() {
+    cd $builddir
+    # TODO 确认cmake版本
+    ${OHOS_SDK}/native/build-tools/cmake/bin/cmake "$@" -DBUILD_SHARED_LIBS=ON -DFT_ENABLE_ERROR_STRINGS=ON -B$testdir/ftb -S./ > $buildlog 2>&1
+    $MAKE -C $testdir/ftb >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd "$builddir"
+    $MAKE -C $testdir/ftb install >> $buildlog 2>&1
+    cd $OLDPWD
+}
+
+check() {
+    echo -e " \n
+    cmake_minimum_required(VERSION 3.16.5) \n
+    project(freetype-cmake-testbuild)\n
+
+    set(FREETYPE_LIBRARY $LYCIUM_ROOT/usr/$pkgname/$ARCH/lib) \n
+    set(FREETYPE_INCLUDE_DIRS $LYCIUM_ROOT/usr/$pkgname/$ARCH/include/freetype2) \n
+	
+    include_directories($LYCIUM_ROOT/usr/$pkgname/$ARCH/include/freetype2) \n
+
+    add_executable(freetype-cmake-test main.c)\n
+	
+    target_link_libraries(freetype-cmake-test PUBLIC $LYCIUM_ROOT/usr/$pkgname/$ARCH/lib/libfreetype.so)\n
+    target_link_libraries(freetype-cmake-test PUBLIC $LYCIUM_ROOT/usr/harfbuzz/$ARCH/lib/libharfbuzz.so)\n
+    target_link_libraries(freetype-cmake-test PUBLIC $LYCIUM_ROOT/usr/brotli/$ARCH/lib/libbrotlidec.so)\n
+    target_link_libraries(freetype-cmake-test PUBLIC $LYCIUM_ROOT/usr/libpng/$ARCH/lib/libpng16.so)\n
+    target_link_libraries(freetype-cmake-test PUBLIC $LYCIUM_ROOT/usr/zlib/$ARCH/lib/libz.so)\n
+
+    enable_testing()\n
+    add_test(freetype-cmake-test freetype-cmake-test)" > $testdir/CMakeLists.txt
+
+    echo -e " \n
+    #include <stdio.h> \n
+    #include <stdlib.h> \n
+
+    #include <ft2build.h> \n
+    #include <freetype/freetype.h> \n
+
+    FT_Library library; \n
+
+    int main(int argc,char*argv[]) \n
+    { \n
+       FT_Error error; \n
+       FT_Int major = 0; \n
+       FT_Int minor = 0; \n
+       FT_Int patch = 0; \n
+
+       error = FT_Init_FreeType(&library); \n
+       if (error) return EXIT_FAILURE; \n
+
+       FT_Library_Version(library, &major, &minor, &patch); \n
+       if (major != FREETYPE_MAJOR|| minor != FREETYPE_MINOR|| patch != FREETYPE_PATCH) return EXIT_FAILURE; \n
+       printf(\"FT_Library_Version:%d.%d.%d\", major, minor, patch);\n
+       error = FT_Done_FreeType(library); \n
+       if (error) return EXIT_FAILURE; \n
+     
+       return EXIT_SUCCESS;
+    }" > $testdir/main.c
+
+    mkdir -p $testdir/tb
+    cd $testdir/tb
+    
+    ${OHOS_SDK}/native/build-tools/cmake/bin/cmake $testdir -DCMAKE_TOOLCHAIN_FILE=$OHOS_SDK/native/build/cmake/ohos.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DOHOS_ARCH=$ARCH >> $buildlog 2>&1
+    ${OHOS_SDK}/native/build-tools/cmake/bin/cmake --build . --config Release >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    echo "The test must be on an OpenHarmony device!"
+    return $ret
+    # cd freetype-cmake-testbuild/tb
+    # ctest -V -C Release
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}
