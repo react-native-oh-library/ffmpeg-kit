@@ -1,0 +1,74 @@
+# Contributor: Jeff Han <hanjinfei@foxmail.com>
+# Maintainer: Jeff Han <hanjinfei@foxmail.com>
+
+pkgname=x265
+pkgver=4.1
+pkgrel=0
+pkgdesc="x265 is a free software library and application for encoding video streams into the H.265/MPEG-H HEVC compression format, and is released under the terms of the GNU GPL."
+url="https://www.videolan.org/developers/x265.html"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("GPLV2")
+depends=()
+makedepends=()
+
+source="http://ftp.videolan.org/pub/videolan/x265/$pkgname\_$pkgver.tar.gz"
+
+autounpack=true
+downloadpackage=true
+buildtools="cmake"
+
+builddir=$pkgname\_$pkgver
+packagename=$builddir.tar.gz
+patchflag=true
+
+source envset.sh
+target=
+prepare() {
+    if $patchflag
+    then
+        cd $builddir
+        patch -p1 < $PKGBUILD_ROOT/x265_4.1_oh_pkg.patch > $publicbuildlog 2>&1
+        # patch只需要打一次,关闭打patch
+        patchflag=false
+        cd $OLDPWD
+    fi
+    mkdir -p $builddir/$ARCH-build
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        target=arm-linux
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        target=aarch64-linux
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+}
+
+build() {
+    cd $builddir
+    ${OHOS_SDK}/native/build-tools/cmake/bin/cmake "$@" -DCROSS_COMPILE_ARM64=ON -DASM_FLAGS=\"--target=$target\" -DENABLE_TESTS=ON -B$ARCH-build -S./source > $buildlog 2>&1
+    $MAKE -C $ARCH-build VERBOSE=1 >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd $builddir
+    $MAKE -C $ARCH-build install >> $buildlog 2>&1
+    cd $OLDPWD
+}
+
+check() {
+    echo "The test must be on an OpenHarmony device!"
+}
+
+recoverpkgbuildenv() {
+    unset target
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}

@@ -1,0 +1,93 @@
+# Contributor: 小肉头君 <chenbaodi@huawei.com>
+# Maintainer: 小肉头君 <chenbaodi@huawei.com>
+
+pkgname=harfbuzz 
+pkgver=7.1.0 
+pkgrel=0 
+pkgdesc="HarfBuzz text shaping engine."
+url="https://github.com/harfbuzz/harfbuzz"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("Old MIT")
+depends=("glib" "freetype2")
+makedepends=()
+source="https://github.com/$pkgname/$pkgname/archive/refs/tags/$pkgver.tar.gz"
+
+autounpack=true
+downloadpackage=true
+buildtools="configure"
+
+builddir=$pkgname-$pkgver 
+packagename=$builddir.tar.gz
+
+source envset.sh
+autogenflag=true
+host=
+
+prepare() {
+    mkdir -p $builddir/$ARCH-build
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        setarm32ENV
+        host=arm-linux
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        setarm64ENV
+        host=aarch64-linux
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+    if $autogenflag
+    then
+        cd $builddir
+        ./autogen.sh > $publicbuildlog 2>&1
+        cd $OLDPWD
+        autogenflag=false
+    fi
+}
+
+build() {
+    cd $builddir/$ARCH-build
+    PKG_CONFIG_LIBDIR=$pkgconfigpath FREETYPE_LIBS="-L$LYCIUM_ROOT/usr/freetype2/$ARCH/lib -lfreetype" \
+        FREETYPE_CFLAGS="-I$LYCIUM_ROOT/usr/freetype2/$ARCH/include/freetype2" ../configure "$@" --host=$host \
+        --with-gobject=yes --with-freetype=yes --with-icu=no --with-glib=yes --with-cairo=no \
+        --enable-static > $buildlog 2>&1
+    $MAKE V=1  >> $buildlog 2>&1
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+# 安装打包
+package() {
+    cd $builddir
+    $MAKE -C $ARCH-build install >> $buildlog 2>&1
+    cd $OLDPWD
+}
+
+# 测试，需要在 ohos 设备上进行
+check() {
+    cd $builddir/$ARCH-build/src
+    $MAKE test-algs test-array test-bimap test-iter test-machinery test-map test-multimap test-number test-ot-tag test-priority-queue test-set test-serialize test-unicode-ranges test-vector test-repacker test-classdef-graph  \
+    check-c-linkage-decls.py check-externs.py check-header-guards.py check-includes.py check-static-inits.py check-symbols.py  check-libstdc++.py >> $buildlog 2>&1
+    cd $OLDPWD
+    unset host
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        unsetarm32ENV
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        unsetarm64ENV
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+    echo "The test must be on an OpenHarmony device!"
+    # real test CMD
+    # make -C src check-TESTS
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}

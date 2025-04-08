@@ -1,0 +1,100 @@
+# Contributor: Jeff Han <hanjinfei@foxmail.com>
+# Maintainer: Jeff Han <hanjinfei@foxmail.com>
+pkgname=libpng
+pkgver=1.6.39
+pkgrel=0
+pkgdesc=""
+url=""
+archs=("armeabi-v7a" "arm64-v8a")
+license=("PNG Reference Library License version 2")
+depends=("zlib") # 采用三方zlib
+makedepends=()
+
+source="https://sourceforge.net/projects/$pkgname/files/libpng16/$pkgver/$pkgname-$pkgver.tar.xz"
+
+autounpack=true
+downloadpackage=true
+buildtools="configure"
+
+builddir=$pkgname-${pkgver}
+packagename=$builddir.tar.xz
+
+source envset.sh
+host=
+
+prepare() {
+    mkdir -p $builddir/$ARCH-build
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        setarm32ENV
+        host=arm-linux
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        setarm64ENV
+        host=aarch64-linux
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+}
+
+build() {
+    cd $builddir/$ARCH-build
+    ../configure "$@" --host=$host --enable-shared --enable-static > $buildlog 2>&1
+    ret=-1
+    if [ $LYCIUM_BUILD_OS == "CYGWI" ]
+    then
+        $MAKE libpng16.la >> $buildlog 2>&1
+        ret=$?
+    else
+        $MAKE >> $buildlog 2>&1
+        ret=$?
+    fi
+    cd $OLDPWD
+    return $ret
+}
+
+package() {
+    cd $builddir/$ARCH-build
+    ret=-1
+    if [ $LYCIUM_BUILD_OS == "CYGWI" ]
+    then   
+        $MAKE install-libLTLIBRARIES >> $buildlog 2>&1
+        $MAKE install-library-links >> $buildlog 2>&1
+        $MAKE install-pkgincludeHEADERS >> $buildlog 2>&1
+        $MAKE install-header-links >> $buildlog 2>&1
+        $MAKE install-pkgconfigDATA >> $buildlog 2>&1
+        ret=$?
+    else
+        $MAKE install >> $buildlog 2>&1
+        ret=$?
+    fi
+    cd $OLDPWD
+    return $ret
+}
+
+check() {
+    cd $builddir/$ARCH-build
+    $MAKE pngtest pngunknown pngstest pngvalid pngimage pngcp timepng >> $buildlog 2>&1
+    sed -i '/.*check-TESTS: $(check_PROGRAMS)/c\check-TESTS: #$(check_PROGRAMS)' Makefile
+    cd $OLDPWD
+    unset host
+    if [ $ARCH == "armeabi-v7a" ]
+    then
+        unsetarm32ENV
+    elif [ $ARCH == "arm64-v8a" ]
+    then
+        unsetarm64ENV
+    else
+        echo "${ARCH} not support"
+        return -1
+    fi
+    echo "The test must be on an OpenHarmony device!"
+    # test CMD
+    # make check-TESTS
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}

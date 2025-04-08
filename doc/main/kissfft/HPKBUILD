@@ -1,0 +1,66 @@
+# Contributor: 小肉头君 <chenbaodi@huawei.com>
+# Maintainer: 小肉头君 <chenbaodi@huawei.com>
+
+pkgname=kissfft
+pkgver=131.1.0
+pkgrel=0 
+pkgdesc="a Fast Fourier Transform (FFT) library that tries to Keep it Simple, Stupid."
+url="https://github.com/mborgerding/kissfft"
+archs=("armeabi-v7a" "arm64-v8a")
+license=("BSD-3-Clause")
+depends=("libpng" "zlib" "fftw3")
+makedepends=()
+source="https://github.com/mborgerding/$pkgname/archive/refs/tags/$pkgver.tar.gz"
+
+autounpack=true
+downloadpackage=true
+patchflag=true
+
+builddir=$pkgname-$pkgver
+packagename=$builddir.tar.gz
+
+prepare() {
+    if $patchflag
+    then
+        cd $builddir
+        # 1.编译test时，cmakelist中有find_package(PythonInterp REQUIRED)，导致交叉编译无法通过。
+        # 在ohos环境中无法通过find_package找到相关资源，所以打patch注释掉python相关用例。
+        # 2.test/testcpp.cc中有一个math.h的引用M_PIl,在ohos的math.h中没有，所以打patch改成M_PI。
+        patch -p1 < `pwd`/../kissfft_oh_pkg.patch
+        # patch只需要打一次,关闭打patch
+        patchflag=false
+        cd $OLDPWD
+    fi
+    mkdir -p $builddir/$ARCH-build
+}
+
+build() {
+    cd $builddir
+    PKG_CONFIG_LIBDIR="${pkgconfigpath}" ${OHOS_SDK}/native/build-tools/cmake/bin/cmake "$@" -DKISSFFT_STATIC=ON -DCMAKE_INSTALL_LIBDIR="$LYCIUM_ROOT/usr/$pkgname/$ARCH/lib" \
+    -DCMAKE_INSTALL_INCLUDEDIR="$LYCIUM_ROOT/usr/$pkgname/$ARCH/include" -DKISSFFT_FLOAT=ON -B$ARCH-build -S./ > $buildlog 2>&1
+    $MAKE -C $ARCH-build >> $buildlog 2>&1
+    # 对最关键一步的退出码进行判断
+    ret=$?
+    cd $OLDPWD
+    return $ret
+}
+
+# 安装打包
+package() {
+    cd $builddir
+    $MAKE -C $ARCH-build install >> $buildlog 2>&1
+    cd $OLDPWD
+}
+
+# 测试，需要在 ohos 设备上进行
+check() {
+    echo "The test must be on an OpenHarmony device!"
+    # real test CMD
+    # 有一个testcpp的用例需要时间，看设备性能，rk3568大概需要7分钟。
+    # ctest
+}
+
+# 清理环境
+cleanbuild() {
+    rm -rf ${PWD}/$builddir #${PWD}/$packagename
+}
