@@ -1909,6 +1909,8 @@ class FFmpegKitInitializer {
     this.#eventEmitter.addListener(eventStatisticsCallbackEvent, FFmpegKitInitializer.processStatisticsCallbackEvent);
     this.#eventEmitter.addListener(eventCompleteCallbackEvent, FFmpegKitInitializer.processCompleteCallbackEvent);
 
+	await FFmpegKitReactNativeModule.registerGlobalCallbacks();
+
     FFmpegKitFactory.setLogLevel(await FFmpegKitReactNativeModule.getLogLevel());
     const version = FFmpegKitFactory.getVersion();
     const platform = await FFmpegKitConfig.getPlatform();
