@@ -50,6 +50,16 @@ target_include_directories(rnoh_ffmpeg_kit PUBLIC
     ${THIRD_PARTY_DIR}/libtasn1/${OHOS_ARCH}/include
     ${THIRD_PARTY_DIR}/gnutls/${OHOS_ARCH}/include
     ${THIRD_PARTY_DIR}/chromaprint/${OHOS_ARCH}/include
+
+    ${THIRD_PARTY_DIR}/openh264/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/opus/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/speex/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/libwebp/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/zstd/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/jbigkit/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/libjpeg-turbo/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/libdeflate/${OHOS_ARCH}/include
+    ${THIRD_PARTY_DIR}/tiff/${OHOS_ARCH}/include
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -89,6 +99,26 @@ target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libtasn1/${OHOS_
 
 target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/chromaprint/${OHOS_ARCH}/lib/libchromaprint.so.1)
 
+# 2025.04.24  start
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/openh264/${OHOS_ARCH}/lib/libopenh264.so.7)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/opus/${OHOS_ARCH}/lib/libopus.so.0)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/speex/${OHOS_ARCH}/lib/libspeex.so.1)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/zstd/${OHOS_ARCH}/lib/libzstd.so.1)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/jbigkit/${OHOS_ARCH}/lib/libjbig.a)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libdeflate/${OHOS_ARCH}/lib/libdeflate.so.0)
+
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libwebp/${OHOS_ARCH}/lib/libsharpyuv.so.0)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libwebp/${OHOS_ARCH}/lib/libwebp.so.7)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libwebp/${OHOS_ARCH}/lib/libwebpdecoder.so.3)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libwebp/${OHOS_ARCH}/lib/libwebpdemux.so.2)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libwebp/${OHOS_ARCH}/lib/libwebpmux.so.3)
+
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libjpeg-turbo/${OHOS_ARCH}/lib/libjpeg.so.62)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/libjpeg-turbo/${OHOS_ARCH}/lib/libturbojpeg.so.0)
+
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/tiff/${OHOS_ARCH}/lib/libtiff.so.6)
+target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/tiff/${OHOS_ARCH}/lib/libtiffxx.so.6)
+# 2025.04.24  end
 
 target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/x264/${OHOS_ARCH}/lib/libx264.so.164)
 target_link_libraries(rnoh_ffmpeg_kit PUBLIC ${THIRD_PARTY_DIR}/x265/${OHOS_ARCH}/lib/libx265.so.215)
