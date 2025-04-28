@@ -97,7 +97,7 @@ export interface Spec extends TurboModule {
   getMediaInformation(sessionId:number):Promise<MediaInformation>;
   mediaInformationJsonParserFrom(ffprobeJsonOutput:string):Promise<MediaInformation>;
   getPackageName():Promise<string>;
-  getExternalLibraries():Promise<string>;
+  getExternalLibraries():Promise<Array<string>>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('NativeRNFFmpegKitModule');

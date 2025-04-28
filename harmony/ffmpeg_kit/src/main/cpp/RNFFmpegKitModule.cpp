@@ -543,6 +543,28 @@ jsi::Value getPackageName(facebook::jsi::Runtime &rt, react::TurboModule &turboM
         });
 }
 
+jsi::Value getExternalLibraries(facebook::jsi::Runtime &rt, react::TurboModule &turboModule,
+                             const facebook::jsi::Value *args, size_t count) {
+    return facebook::react::createPromiseAsJSIValue(rt, [](jsi::Runtime &runtime,
+                                                           std::shared_ptr<facebook::react::Promise> promise) {
+            std::string libs[] = {
+                "dav1d",    "FFmpeg",   "lame",    "libogg",     "libvorbis",    "libvpx",     "openmp",   "rapidjson",
+                "vid.stab", "x264",     "x265",    "xvidcore",   "libass",        "libunibreak", "freetype2", "brotli",
+                "fribidi",  "harfbuzz", "libpng",  "fontconfig", "libxml2",       "xz",          "json-c",    "glib",
+                "nettle",   "gmp",      "libidn2", "libtasn1",   "gnutls",        "chromaprint", "openh264",  "opus",
+                "speex",    "libwebp",  "zstd",    "jbigkit",    "libjpeg-turbo", "libdeflate",  "tiff"};
+
+            size_t length = std::size(libs);
+            jsi::Array libArray(runtime, length);
+
+            for (int i = 0; i < length; ++i) {
+                libArray.setValueAtIndex(runtime, i, libs[i]);
+            }
+
+            promise->resolve(jsi::Value(runtime, libArray));
+        });
+}
+
 /**
  * enableRedirection：开启日志和统计重定向 (已完成)
  *
@@ -1388,6 +1410,7 @@ RNFFmpegKitModule::RNFFmpegKitModule(const ArkTSTurboModule::Context ctx, const 
         {"getPlatform", {0, rnoh::getPlatform}},
         {"getArch", {0, rnoh::getArch}},
         {"getPackageName", {0, rnoh::getPackageName}},
+        {"getExternalLibraries", {0, rnoh::getExternalLibraries}},
         {"isLTSBuild", {0, rnoh::isLTSBuild}},
         {"mediaInformationSessionExecute", {2, rnoh::mediaInformationSessionExecute}},
         {"asyncMediaInformationSessionExecute", {2, rnoh::asyncMediaInformationSessionExecute}},
