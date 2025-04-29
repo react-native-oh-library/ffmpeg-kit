@@ -60,8 +60,6 @@ jsi::Value asyncFFmpegSessionExecute(facebook::jsi::Runtime &rt, react::TurboMod
                 promise->reject("NOT_FFMPEG_SESSION: A session is found but it does not have the correct type.");
                 return;
             }
-        
-             DLOG(ERROR) << "jk----------------> CPP asyncFFmpegSessionExecute 正在执行";
 
             auto ffmpegSession = std::dynamic_pointer_cast<ffmpegkit::FFmpegSession>(session);
             ffmpegkit::FFmpegKitConfig::asyncFFmpegExecute(ffmpegSession);
@@ -959,13 +957,8 @@ jsi::Value registerNewFFmpegPipe(facebook::jsi::Runtime &rt, react::TurboModule 
                                           const facebook::jsi::Value *args, size_t count) {
     return facebook::react::createPromiseAsJSIValue(
         rt, [](jsi::Runtime &runtime, std::shared_ptr<facebook::react::Promise> promise) {
-            DLOG(INFO) << "jk--------------->CPP registerNewFFmpegPipe start ";
-        
             std::shared_ptr<std::string> newFFmpegPipe = ffmpegkit::FFmpegKitConfig::registerNewFFmpegPipe();
-            DLOG(INFO) << "jk--------------->CPP registerNewFFmpegPipe newFFmpegPipePath: " << newFFmpegPipe->c_str();
-        
             promise->resolve(jsi::Value(runtime,jsi::String::createFromUtf8(runtime, newFFmpegPipe->c_str()))); 
-            DLOG(INFO) << "jk--------------->CPP registerNewFFmpegPipe end";
         });
 }
 
@@ -1289,21 +1282,75 @@ jsi::Value abstractSessionThereAreAsynchronousMessagesInTransmit(facebook::jsi::
         });
 }
 
+int executeCommand(const std::string& command) {
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+        DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe popen failed to execute command.";
+        throw std::runtime_error("popen failed to execute command");
+    }
+    int exitCode = pclose(pipe);
+    if (exitCode == -1) {
+        DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe pclose failed.";
+        throw std::runtime_error("pclose failed");
+    }
+    return WEXITSTATUS(exitCode); // Extract the actual exit code
+}
+
+bool fileExists(const std::string& path) {
+    struct stat buffer;
+    return (stat(path.c_str(), &buffer) == 0);
+}
+
 jsi::Value writeToPipe(facebook::jsi::Runtime &rt, react::TurboModule &turboModule,
                              const facebook::jsi::Value *args, size_t count) {
     return facebook::react::createPromiseAsJSIValue(
         rt, [&args, &turboModule](jsi::Runtime &runtime, std::shared_ptr<facebook::react::Promise> promise) {
+
             if (!args[0].isString()) {
                 promise->reject("INVALID_INPUTPATH: inputPath not found.");
                 return;
             }
-        
+
             if (!args[1].isString()) {
                 promise->reject("INVALID_NAMEDPIPEPATH: namedPipePath not found.");
                 return;
             }
+
+            const std::string LIBRARY_NAME = "ffmpeg-kit-react-native";
+            std::string inputPath = args[0].getString(runtime).utf8(runtime);
+            std::string namedPipePath = args[1].getString(runtime).utf8(runtime);
+
+            try {
+                // Check if input file exists
+                if (!fileExists(inputPath)) {
+                    DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe fileExists. Input file does not exist: " << inputPath;
+                    throw std::runtime_error("Input file does not exist: " + inputPath);
+                }
+                // Check if named pipe exists
+                if (!fileExists(namedPipePath)) {
+                    DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe fileExists. Named pipe does not exist: " << namedPipePath;
+                    throw std::runtime_error("Named pipe does not exist: " + namedPipePath);
+                }
+                // Construct the shell command
+                std::string asyncCommand = "cat " + inputPath + " > " + namedPipePath;
+                // Record the start time
+                auto startTime = std::chrono::high_resolution_clock::now();
+                // Execute the command
+                int rc = executeCommand(asyncCommand);
         
-//             std::process::process proc = std::process::execute("sh", {"-c", "your_async_command"});
+                // Record the end time
+                auto endTime = std::chrono::high_resolution_clock::now();
+                std::chrono::duration<double> elapsed = endTime - startTime;
+
+                DLOG(INFO) << LIBRARY_NAME << " Copying " << inputPath << " to pipe " << namedPipePath
+                           << " operation completed with rc " << std::to_string(rc) << " in "
+                           << std::to_string(static_cast<int>(elapsed.count())) << " seconds.";
+                promise->resolve(jsi::Value(rc));
+            } catch (const std::exception& e) {
+                DLOG(ERROR) << LIBRARY_NAME << " Copy " << inputPath << " to pipe " << namedPipePath << " failed with error."
+                           << e.what() << std::endl;
+                promise->reject("Copy failed: Copy " + inputPath + " to pipe " + namedPipePath + " failed with error.");
+            }
 
         });
 }
@@ -1447,7 +1494,7 @@ RNFFmpegKitModule::RNFFmpegKitModule(const ArkTSTurboModule::Context ctx, const 
         ARK_METHOD_METADATA(removeListeners, 1),
     };
     std::thread::id this_id = std::this_thread::get_id();
-    DLOG(INFO) << "jk------------->CPP RNFFmpegKitModule 初始化成功，当前 JS 线程ID：" << this_id;
+    DLOG(INFO) << "CPP RNFFmpegKitModule 初始化成功，当前 JS 线程ID：" << this_id;
 }
 
 facebook::jsi::Object RNFFmpegKitModule::toMap(facebook::jsi::Runtime &runtime, std::shared_ptr<ffmpegkit::Session> session) {
@@ -1545,7 +1592,7 @@ facebook::jsi::Value RNFFmpegKitModule::medInfoToMap(facebook::jsi::Runtime &run
             return jsArray;
         }
         default:
-            DLOG(INFO) << "jk------------->CPP medInfoToMap 解析时遇到类型不匹配的情况.";
+            DLOG(INFO) << "CPP medInfoToMap 解析时遇到类型不匹配的情况.";
             break;
             
     }
@@ -1576,7 +1623,6 @@ void RNFFmpegKitModule::registerGlobalCallbacks(facebook::jsi::Runtime &runtime)
                 jsi::Value sessionInfo[1];
                 sessionInfo[0] = jsi::Value(static_cast<int>(ffmpegkit_session->getSessionId()));
                 this->call(runtime, "FFmpegKitCompleteCallbackEvent", sessionInfo, 1);
-                DLOG(INFO) << "jk---------> CPP registerGlobalCallbacks  enableFFprobeSessionCompleteCallback";
             });
         });
 
@@ -1587,7 +1633,6 @@ void RNFFmpegKitModule::registerGlobalCallbacks(facebook::jsi::Runtime &runtime)
                 jsi::Value sessionInfo[1];
                 sessionInfo[0] = jsi::Value(static_cast<int>(ffmpegkit_session->getSessionId()));
                 this->call(runtime, "FFmpegKitCompleteCallbackEvent", sessionInfo, 1);
-                DLOG(INFO) << "jk---------> CPP registerGlobalCallbacks  enableFFmpegSessionCompleteCallback";
             });
         });
 
@@ -1600,14 +1645,12 @@ void RNFFmpegKitModule::registerGlobalCallbacks(facebook::jsi::Runtime &runtime)
             jsi::Value sessionInfo[1];
             sessionInfo[0] = jsi::Value(this->toMap(runtime, ffmpegkit_session).getProperty(runtime, "sessionId"));
             this->call(runtime, "FFmpegKitCompleteCallbackEvent", sessionInfo, 1);
-            DLOG(INFO) << "jk---------> CPP registerGlobalCallbacks  enableMediaInformationSessionCompleteCallback: RNOH_JS";
         } else {
             this->getContext().taskExecutor->runTask(TaskThread::JS, [this, &runtime, session]() {
                 auto ffmpegkit_session = std::dynamic_pointer_cast<ffmpegkit::Session>(session);
                 jsi::Value sessionInfo[1];
                 sessionInfo[0] = jsi::Value(this->toMap(runtime, ffmpegkit_session).getProperty(runtime, "sessionId"));
                 this->call(runtime, "FFmpegKitCompleteCallbackEvent", sessionInfo, 1);
-                DLOG(INFO) << "jk---------> CPP registerGlobalCallbacks  enableMediaInformationSessionCompleteCallback";
             });
         }
         });
