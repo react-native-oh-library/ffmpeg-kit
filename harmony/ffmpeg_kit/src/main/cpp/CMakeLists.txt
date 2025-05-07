@@ -19,47 +19,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-int-conversion -Wl,-Bsymbolic")
 set(THIRD_PARTY_DIR "${NODE_MODULES}/@react-native-oh-tpl/react-native-ffmpeg-kit/thirdparty/usr")
 
 target_include_directories(rnoh_ffmpeg_kit PUBLIC
-    ${THIRD_PARTY_DIR}/dav1d/${OHOS_ARCH}/include
     ${THIRD_PARTY_DIR}/FFmpeg/${OHOS_ARCH}/include
     ${THIRD_PARTY_DIR}/ffmpeg-kit/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/lame/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libogg/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libvorbis/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libvpx/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/openmp/${OHOS_ARCH}/include
     ${THIRD_PARTY_DIR}/rapidjson/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/vid.stab/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/x264/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/x265/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/xvidcore/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libass/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libunibreak/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/freetype2/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/brotli/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/fribidi/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/harfbuzz/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libpng/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/fontconfig/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libxml2/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/xz/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/json-c/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/glib/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/nettle/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/gmp/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libidn2/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libtasn1/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/gnutls/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/chromaprint/${OHOS_ARCH}/include
-
-    ${THIRD_PARTY_DIR}/openh264/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/opus/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/speex/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libwebp/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/zstd/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/jbigkit/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libjpeg-turbo/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/libdeflate/${OHOS_ARCH}/include
-    ${THIRD_PARTY_DIR}/tiff/${OHOS_ARCH}/include
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
