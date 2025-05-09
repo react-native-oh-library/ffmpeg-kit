@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<oatconfig>
+	<licensefile>LICENSE</licensefile>
+		<filefilterlist>
+			<filefilter name="copyrightPolicyFilter" desc="Filters for compatibility，license header policies">
+				<filteritem type="filename" name="hvigorfile.ts" desc="hvigor构建脚本，DevEco Studio自动生成，不需要添加版权头"/>
+				<filteritem type="filename" name="*.json5" desc="hvigor工程配置文件，DevEco Studio自动生成，不需要添加版权头"/>
+				<filteritem type="filename" name="*.proto" desc="资源文件，不需要添加版权头"/>
+				<filteritem type="filename" name="*.json" desc="资源文件，不需要添加版权头"/>
+				<filteritem type="filepath" name="hvigorw" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filename" name="hvigorw.bat" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filename" name="hvigor-wrapper.js" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filename" name=".eslintrc" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filename" name="BuildProfile.ets" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+                <filteritem type="filename" name="LICENSE" desc="原三方库证书文件无需更改，因此添加过滤"/>		
+				<filteritem type="filename" name=".watchmanconfig" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="Gemfile" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="metro.config.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="babel.config.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="app.json" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name=".prettierrc.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name=".npmrc" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name=".node-version" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="index.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="App.tsx" desc="工程配置文件无需更改，因此添加过滤"/>
+			</filefilter>
+			<filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
+				<filteritem type="filename" name="hvigorfile.ts" desc="hvigor构建脚本，DevEco Studio自动生成，不需要添加许可证头"/>
+				<filteritem type="filename" name="*.json5" desc="hvigor工程配置文件，DevEco Studio自动生成，不需要添加许可证头"/>
+				<filteritem type="filename" name="LICENSE" desc="原三方库证书文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="*.proto" desc="资源文件，不需要添加许可证头"/>
+				<filteritem type="filename" name="*.json" desc="资源文件，不需要添加许可证头"/>
+				<filteritem type="filename" name=".eslintrc" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filepath" name="hvigorw" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filename" name="hvigorw.bat" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filename" name="hvigor-wrapper.js" desc="工程模板，不修改版权头，以防有修改版权风险"/>
+				<filteritem type="filename" name="BuildProfile.ets" desc="工程模板，不修改版权头，以防有修改版权风险"/>	
+				<filteritem type="filename" name=".watchmanconfig" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="Gemfile" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="metro.config.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="babel.config.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="app.json" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name=".prettierrc.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name=".npmrc" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name=".node-version" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="index.js" desc="工程配置文件无需更改，因此添加过滤"/>
+				<filteritem type="filename" name="App.tsx" desc="工程配置文件无需更改，因此添加过滤"/>				
+			</filefilter>
+			<filefilter name="binaryFileTypePolicyFilter" desc="Filters for resources files policies">
+				<filteritem type="filename" name="ffmpeg_kit.har" desc="版本包"/>
+                <filteritem type="filename" name="toolchain.tar.gz" desc="编译工具包"/>
+				<filteritem type="filename" name="gradle-wrapper.jar" desc="工程文件"/>
+				<filteritem type="filename" name="debug.keystore" desc="工程文件"/>
+				<filteritem type="filename" name="Pacifico-Regular.ttf" desc="应用字体文件"/>
+				<filteritem type="filename" name="StintUltraCondensed-Regular.ttf" desc="应用字体文件"/>
+				<filteritem type="filename" name="rnoh-testerino-0.0.9.tgz" desc="工程文件"/>
+				<filteritem type="filename" name="icon.png" desc="应用图标"/>
+				<filteritem type="filename" name="app_icon.png" desc="应用图标"/>
+				<filteritem type="filename" name="ic_launcher.png" desc="页面展示图标"/>
+				<filteritem type="filename" name="ic_launcher_round.png" desc="页面展示图标"/>、
+                <filteritem type="filename" name="LICENSE" desc="原三方库证书文件无需更改，因此添加过滤"/>
+                <filteritem type="filename" name="src/index.d.ts" desc="原三方库文件无需更改，因此添加过滤"/>
+			</filefilter>
+                
+		</filefilterlist>
+        <policylist>
+            <policy name="projectPolicy" desc="">
+                <policyitem type="license" name="MIT" path=".*" desc="license under the MIT"/>
+                <policyitem type="license" path="doc/.*" group="defaultGroup" filefilter="defaultPolicyFilter" desc="指导文档，无需license"/>
+                <policyitem type="license" path="doc/*" group="defaultGroup" filefilter="defaultPolicyFilter" desc="指导文档，无需license"/>
+                <policyitem type="copyright" path="doc/.*" group="defaultGroup" filefilter="defaultPolicyFilter" desc="指导文档，无需版本头"/>
+                <policyitem type="copyright" path="doc/*" group="defaultGroup" filefilter="defaultPolicyFilter" desc="指导文档，无需版本头"/>
+                <policyitem type="license" path="src/index.d.ts" group="defaultGroup" filefilter="defaultPolicyFilter" desc="原三方库文件无需更改，因此添加过滤"/>
+                <policyitem type="license" path="ffmpeg-kit-react-native.podspec" group="defaultGroup" filefilter="defaultPolicyFilter" desc="原三方库文件无需更改，因此添加过滤"/>
+                <policyitem type="copyright" path="src/index.d.ts" group="defaultGroup" filefilter="defaultPolicyFilter" desc="原三方库文件无需更改，因此添加过滤"/>
+                <policyitem type="copyright" path="ffmpeg-kit-react-native.podspec" group="defaultGroup" filefilter="defaultPolicyFilter" desc="原三方库文件无需更改，因此添加过滤"/>
+            </policy>
+        </policylist>
+	</oatconfig>
+</configuration>
