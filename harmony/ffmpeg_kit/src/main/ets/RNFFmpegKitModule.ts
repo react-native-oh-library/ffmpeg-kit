@@ -54,7 +54,6 @@ export class RNFFmpegKitModule extends TurboModule  implements TM.RNFFmpegKitMod
     });
   }
   FFmpegKitCompleteCallbackEvent(sessionId: number): void {
-    console.log("jk---------> CPP registerGlobalCallbacks [ArkTs] 以收到 [CPP] 发送的事件")
     this.ctx.rnInstance.emitDeviceEvent("FFmpegKitCompleteCallbackEvent",{"sessionId": sessionId});
   }
 
