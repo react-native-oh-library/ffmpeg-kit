@@ -16,7 +16,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-int-conversion -Wl,-Bsymbolic")
 
 ############################################## ffmpeg 相关 start ######################################################
 
-set(THIRD_PARTY_DIR "${NODE_MODULES}/@react-native-oh-tpl/react-native-ffmpeg-kit/thirdparty/usr")
+set(THIRD_PARTY_DIR "${NODE_MODULES}/@react-native-ohos/react-native-ffmpeg-kit/thirdparty/usr")
 
 target_include_directories(rnoh_ffmpeg_kit PUBLIC
     ${THIRD_PARTY_DIR}/FFmpeg/${OHOS_ARCH}/include

@@ -1524,7 +1524,7 @@ facebook::jsi::Object RNFFmpegKitModule::toMap(facebook::jsi::Runtime &runtime, 
     facebook::jsi::Object jsObj(runtime);
     
     jsObj.setProperty(runtime, "sessionId", jsi::Value(static_cast<int>(session->getSessionId())));
-    jsObj.setProperty(runtime, "createTime", jsi::Value(atd::abs(static_cast<int>(session->getCreateTime().time_since_epoch().count()))));
+    jsObj.setProperty(runtime, "createTime", jsi::Value(std::abs(static_cast<int>(session->getCreateTime().time_since_epoch().count()))));
     jsObj.setProperty(runtime, "startTime", jsi::Value(std::abs(static_cast<int>(session->getStartTime().time_since_epoch().count()))));
     jsObj.setProperty(runtime, "command", jsi::String::createFromUtf8(runtime, session->getCommand()));
     
