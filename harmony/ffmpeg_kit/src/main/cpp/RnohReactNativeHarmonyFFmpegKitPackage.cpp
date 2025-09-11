@@ -27,7 +27,6 @@
 #include "RNOH/ArkTSTurboModule.h"
 #include "RNFFmpegKitModule.h"
 #include <glog/logging.h>
-#include <react/renderer/debug/SystraceSection.h>
 
 using namespace rnoh;
 using namespace facebook;
