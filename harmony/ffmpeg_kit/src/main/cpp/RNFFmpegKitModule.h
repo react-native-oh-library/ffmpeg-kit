@@ -35,9 +35,12 @@ namespace rnoh {
 
 class JSI_EXPORT RNFFmpegKitModule : public ArkTSTurboModule {
   public:
-
     bool logsEnabled = false;
     bool statisticsEnabled = false;
+    Context getContext()
+    {
+      return m_ctx;
+    }
 
     RNFFmpegKitModule(const ArkTSTurboModule::Context ctx, const std::string name);
     facebook::jsi::Object statisticsToMap(facebook::jsi::Runtime &runtime, const std::shared_ptr<ffmpegkit::Statistics> &statistics);
