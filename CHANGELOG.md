@@ -1,4 +1,11 @@
 # Changelog 
+
+## v6.1.0-rc.1
+
+### Updated content
+
+- pre-release version v6.1.0-rc.1
+
 ## v6.0.3-rc.2
 
 ### 更新内容
