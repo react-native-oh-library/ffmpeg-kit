@@ -1,5 +1,5 @@
 {
-  "name": "@react-native-oh-tpl/react-native-ffmpeg-kit",
+  "name": "@react-native-ohos/react-native-ffmpeg-kit",
   "version": "6.0.3-rc.2",
   "description": "FFmpeg Kit for React Native",
   "main": "src/index",
@@ -19,7 +19,13 @@
     "ios"
   ],
   "harmony": {
-    "alias": "ffmpeg-kit-react-native"
+    "alias": "ffmpeg-kit-react-native",
+    "autolinking": {
+      "etsPackageClassName":"FFmpegKitPackage",
+      "cppPackageClassName":"FFmpegKitPackage",
+      "cmakeLibraryTargetName": "rnoh_ffmpeg_kit", 
+      "ohPackageName": "@react-native-ohos/react-native-ffmpeg-kit"
+    }
   },
   "repository": "https://github.com/arthenica/ffmpeg-kit",
   "author": "ARTHENICA <open-source@arthenica.com> (https://www.arthenica.com)",
