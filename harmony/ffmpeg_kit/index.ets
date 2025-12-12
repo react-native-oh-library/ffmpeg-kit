@@ -22,4 +22,6 @@
  * SOFTWARE.
  */
 
+import { FFmpegKitPackage } from './src/main/ets/FFmpegKitPackage'
 export * from "./ts"
+export default FFmpegKitPackage

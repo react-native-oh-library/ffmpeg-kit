@@ -23,7 +23,8 @@
  */
 
 import type { RNPackageContext, UITurboModule, UITurboModuleContext } from '@rnoh/react-native-openharmony/ts';
-import { RNPackage, UITurboModuleFactory } from '@rnoh/react-native-openharmony/ts';
+import { UITurboModuleFactory } from '@rnoh/react-native-openharmony/ts';
+import { RNOHPackage } from '@rnoh/react-native-openharmony'
 import { RNFFmpegKitModule } from './RNFFmpegKitModule';
 import { TM } from "./namespace/ts"
 
@@ -40,7 +41,7 @@ class FFmpegKitPackageTurboModulesFactory extends UITurboModuleFactory {
   }
 }
 
-export class FFmpegKitPackage extends RNPackage {
+export class FFmpegKitPackage extends RNOHPackage {
   createTurboModulesFactory(ctx: UITurboModuleContext): UITurboModuleFactory {
     return new FFmpegKitPackageTurboModulesFactory(ctx);
   }
