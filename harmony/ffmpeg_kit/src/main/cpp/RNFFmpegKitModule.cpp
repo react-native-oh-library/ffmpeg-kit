@@ -980,7 +980,11 @@ jsi::Value registerNewFFmpegPipe(facebook::jsi::Runtime &rt, react::TurboModule 
     return facebook::react::createPromiseAsJSIValue(
         rt, [](jsi::Runtime &runtime, std::shared_ptr<facebook::react::Promise> promise) {
             std::shared_ptr<std::string> newFFmpegPipe = ffmpegkit::FFmpegKitConfig::registerNewFFmpegPipe();
-            promise->resolve(jsi::Value(runtime,jsi::String::createFromUtf8(runtime, newFFmpegPipe->c_str()))); 
+            if (newFFmpegPipe == nullptr) {
+                promise->reject("registerNewFFmpegPipe failed");
+            } else {
+                promise->resolve(jsi::Value(runtime,jsi::String::createFromUtf8(runtime, newFFmpegPipe->c_str()))); 
+            }
         });
 }
 
