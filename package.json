@@ -1,6 +1,6 @@
 {
   "name": "@react-native-ohos/react-native-ffmpeg-kit",
-  "version": "6.1.0-rc.4",
+  "version": "6.1.0",
   "description": "FFmpeg Kit for React Native",
   "main": "src/index",
   "types": "src/index.d.ts",
