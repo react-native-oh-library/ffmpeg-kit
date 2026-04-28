@@ -19,7 +19,13 @@
     "ios"
   ],
   "harmony": {
-    "alias": "ffmpeg-kit-react-native"
+    "alias": "ffmpeg-kit-react-native",
+    "autolinking": {
+      "cppPackageClassName": "FFmpegKitPackage",
+      "cmakeLibraryTargetName": "rnoh_ffmpeg_kit",
+      "ohPackageName": "@react-native-ohos/react-native-ffmpeg-kit",
+      "etsPackageClassName": "FFmpegKitPackage"
+    }
   },
   "repository": "https://github.com/react-native-oh-library/ffmpeg-kit",
   "bugs": {
