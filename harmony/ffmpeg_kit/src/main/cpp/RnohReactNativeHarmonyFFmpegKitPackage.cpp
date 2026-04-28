@@ -48,7 +48,7 @@ std::unique_ptr<TurboModuleFactoryDelegate> RnohReactNativeHarmonyFFmpegKitPacka
 
 class FFmpegKitEventEmitRequestHandler : public EventEmitRequestHandler {
     void handleEvent(EventEmitRequestHandler::Context const &ctx) override {
-        facebook::react::SystraceSection s("RNGH::FFmpegKitEventEmitRequestHandler::handleEvent");
+        facebook::react::TraceSection s("RNGH::FFmpegKitEventEmitRequestHandler::handleEvent");
         auto eventEmitter = ctx.shadowViewRegistry->getEventEmitter<facebook::react::ViewEventEmitter>(ctx.tag);
         if (eventEmitter == nullptr) {
             return;
