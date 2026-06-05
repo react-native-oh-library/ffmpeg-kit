@@ -32,6 +32,10 @@
 #include "Signal.h"
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
+#include <cerrno>
+#include <thread>
+#include "ThreadPool.h"
 #include <hermes/hermes.h>
 
 namespace rnoh {
@@ -981,9 +985,10 @@ jsi::Value registerNewFFmpegPipe(facebook::jsi::Runtime &rt, react::TurboModule 
         rt, [](jsi::Runtime &runtime, std::shared_ptr<facebook::react::Promise> promise) {
             std::shared_ptr<std::string> newFFmpegPipe = ffmpegkit::FFmpegKitConfig::registerNewFFmpegPipe();
             if (newFFmpegPipe == nullptr) {
+                DLOG(ERROR) << "ffmpeg-kit [registerNewFFmpegPipe] failed, HOME=" << (getenv("HOME") ? getenv("HOME") : "(null)");
                 promise->reject("registerNewFFmpegPipe failed");
             } else {
-                promise->resolve(jsi::Value(runtime,jsi::String::createFromUtf8(runtime, newFFmpegPipe->c_str()))); 
+                promise->resolve(jsi::Value(runtime,jsi::String::createFromUtf8(runtime, newFFmpegPipe->c_str())));
             }
         });
 }
@@ -1308,23 +1313,44 @@ jsi::Value abstractSessionThereAreAsynchronousMessagesInTransmit(facebook::jsi::
         });
 }
 
-int executeCommand(const std::string& command) {
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-        DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe popen failed to execute command.";
-        throw std::runtime_error("popen failed to execute command");
-    }
-    int exitCode = pclose(pipe);
-    if (exitCode == -1) {
-        DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe pclose failed.";
-        throw std::runtime_error("pclose failed");
-    }
-    return WEXITSTATUS(exitCode); // Extract the actual exit code
-}
-
 bool fileExists(const std::string& path) {
     struct stat buffer;
     return (stat(path.c_str(), &buffer) == 0);
+}
+
+int copyFileToPipe(const std::string& inputPath, const std::string& namedPipePath) {
+    const int BUFFER_SIZE = 4096;
+    char buffer[BUFFER_SIZE];
+
+    FILE* inputFile = fopen(inputPath.c_str(), "rb");
+    if (!inputFile) {
+        DLOG(ERROR) << "ffmpeg-kit [copyFileToPipe] failed to open input: " << inputPath << ", errno=" << errno;
+        return -1;
+    }
+
+    FILE* pipeFile = fopen(namedPipePath.c_str(), "wb");
+    if (!pipeFile) {
+        DLOG(ERROR) << "ffmpeg-kit [copyFileToPipe] failed to open pipe: " << namedPipePath << ", errno=" << errno;
+        fclose(inputFile);
+        return -2;
+    }
+
+    size_t bytesRead;
+    size_t totalWritten = 0;
+    while ((bytesRead = fread(buffer, 1, BUFFER_SIZE, inputFile)) > 0) {
+        size_t bytesWritten = fwrite(buffer, 1, bytesRead, pipeFile);
+        if (bytesWritten != bytesRead) {
+            DLOG(ERROR) << "ffmpeg-kit [copyFileToPipe] write failed, read=" << bytesRead << " written=" << bytesWritten;
+            fclose(inputFile);
+            fclose(pipeFile);
+            return -3;
+        }
+        totalWritten += bytesWritten;
+    }
+
+    fclose(inputFile);
+    fclose(pipeFile);
+    return 0;
 }
 
 jsi::Value writeToPipe(facebook::jsi::Runtime &rt, react::TurboModule &turboModule,
@@ -1342,41 +1368,39 @@ jsi::Value writeToPipe(facebook::jsi::Runtime &rt, react::TurboModule &turboModu
                 return;
             }
 
-            const std::string LIBRARY_NAME = "ffmpeg-kit-react-native";
             std::string inputPath = args[0].getString(runtime).utf8(runtime);
             std::string namedPipePath = args[1].getString(runtime).utf8(runtime);
 
-            try {
-                // Check if input file exists
-                if (!fileExists(inputPath)) {
-                    DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe fileExists. Input file does not exist: " << inputPath;
-                    throw std::runtime_error("Input file does not exist: " + inputPath);
-                }
-                // Check if named pipe exists
-                if (!fileExists(namedPipePath)) {
-                    DLOG(ERROR) << "ffmpeg-kit RNFFmpegKitModule writeToPipe fileExists. Named pipe does not exist: " << namedPipePath;
-                    throw std::runtime_error("Named pipe does not exist: " + namedPipePath);
-                }
-                // Construct the shell command
-                std::string asyncCommand = "cat " + inputPath + " > " + namedPipePath;
-                // Record the start time
-                auto startTime = std::chrono::high_resolution_clock::now();
-                // Execute the command
-                int rc = executeCommand(asyncCommand);
-        
-                // Record the end time
-                auto endTime = std::chrono::high_resolution_clock::now();
-                std::chrono::duration<double> elapsed = endTime - startTime;
-
-                DLOG(INFO) << LIBRARY_NAME << " Copying " << inputPath << " to pipe " << namedPipePath
-                           << " operation completed with rc " << std::to_string(rc) << " in "
-                           << std::to_string(static_cast<int>(elapsed.count())) << " seconds.";
-                promise->resolve(jsi::Value(rc));
-            } catch (const std::exception& e) {
-                DLOG(ERROR) << LIBRARY_NAME << " Copy " << inputPath << " to pipe " << namedPipePath << " failed with error."
-                           << e.what() << std::endl;
-                promise->reject("Copy failed: Copy " + inputPath + " to pipe " + namedPipePath + " failed with error.");
+            if (!fileExists(inputPath)) {
+                DLOG(ERROR) << "ffmpeg-kit [writeToPipe] input file does not exist: " << inputPath;
+                promise->reject("Input file does not exist: " + inputPath);
+                return;
             }
+            if (!fileExists(namedPipePath)) {
+                DLOG(ERROR) << "ffmpeg-kit [writeToPipe] named pipe does not exist: " << namedPipePath;
+                promise->reject("Named pipe does not exist: " + namedPipePath);
+                return;
+            }
+
+            auto self = static_cast<RNFFmpegKitModule *>(&turboModule);
+
+            // Execute blocking pipe I/O on background thread (same as iOS dispatch_async / Android executorService)
+            ThreadPool::getInstance().enqueue([self, inputPath, namedPipePath, promise, &runtime]() {
+                int rc = copyFileToPipe(inputPath, namedPipePath);
+
+                // Dispatch promise resolve/reject back to JS thread
+                if (rc != 0) {
+                    std::string errMsg = "Copy " + inputPath + " to pipe " + namedPipePath + " failed with rc=" + std::to_string(rc);
+                    DLOG(ERROR) << "ffmpeg-kit [writeToPipe] " << errMsg;
+                    self->getContext().taskExecutor->runTask(TaskThread::JS, [promise, errMsg]() {
+                        promise->reject(errMsg);
+                    });
+                } else {
+                    self->getContext().taskExecutor->runTask(TaskThread::JS, [promise, rc]() {
+                        promise->resolve(jsi::Value(rc));
+                    });
+                }
+            });
 
         });
 }
